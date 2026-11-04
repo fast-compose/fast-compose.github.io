@@ -30,6 +30,8 @@ holds only the meta tags, a loader shown until compose-script starts, and a `<no
 | `index.html` | The home page |
 | `logo.png` | The Fast Compose logo, used by the loader and link previews |
 | `playground/` | The playground's web build |
+| `sitemap.xml` | Lists the home page and the playground for search engines |
+| `robots.txt` | Allows all crawlers and points to the sitemap |
 | `google5c60200d1c49780f.html` | Google Search Console verification |
 
 ## License
