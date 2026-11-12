@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fast Compose - An instant runtime for Jetpack Compose code</title>
     <meta name="description"
-          content="Fast Compose runs Jetpack Compose code without a compiler or a build. Use it in the browser playground, in static web pages with compose-script, in Android Studio and IntelliJ IDEA, and from the terminal.">
+          content="Fast Compose runs Jetpack Compose code without a compiler or a build. Use it in the browser playground, in static web pages with compose-script, in Android Studio, IntelliJ IDEA and VS Code, and from the terminal.">
     <meta name="keywords"
-          content="Jetpack Compose, Compose Multiplatform, Kotlin, live preview, @Preview, Compose online, compose-script, Android Studio plugin, Fast Compose">
+          content="Jetpack Compose, Compose Multiplatform, Kotlin, live preview, @Preview, Compose online, compose-script, Android Studio plugin, VS Code extension, Fast Compose">
     <link rel="canonical" href="https://fast-compose.github.io/">
     <meta name="theme-color" content="#0B1020">
 
@@ -65,6 +65,7 @@
         <li><a href="playground/">Playground</a>: run Jetpack Compose online.</li>
         <li><a href="https://github.com/fast-compose/compose-script">Compose Script</a>: live Compose inside any web page.</li>
         <li><a href="https://plugins.jetbrains.com/plugin/35776-fast-compose-preview">IDE Plugin</a>: instant previews in Android Studio and IntelliJ IDEA.</li>
+        <li><a href="https://marketplace.visualstudio.com/items?itemName=fast-compose.fast-compose-preview">VS Code Extension</a>: instant previews in VS Code.</li>
         <li><a href="https://github.com/fast-compose/fast-compose/blob/main/docs/LIBRARY.md">KMP Library</a>: render Compose code at runtime in your Kotlin Multiplatform apps.</li>
         <li><a href="https://github.com/fast-compose/compose-cli">CLI and MCP</a>: check and render previews from the terminal and AI agents.</li>
     </ul>
@@ -73,18 +74,7 @@
 <script type="text/compose-content" data-composable="Home" style="width: 100%; height: 100vh">
     // ---------- theme ----------
 
-    val Bg = Color(0xFF0B1020)
-    val Bg2 = Color(0xFF111832)
-    val CodeBg = Color(0xFF070B17)
-    val Line = Color(0xFF222B4A)
-    val Ink = Color(0xFFE6E9F5)
-    val Muted = Color(0xFF98A2C3)
-    val Green = Color(0xFF3DDC84)
-    val Blue = Color(0xFF3B82F6)
-    val Indigo = Color(0xFF5B4BD6)
-    val Amber = Color(0xFFFBBF24)
-    val Red = Color(0xFFF87171)
-
+    // Code highlighting, outside the Material theme
     val Tag = Color(0xFF7DD3FC)
     val Attr = Color(0xFFA5B4FC)
     val Str = Color(0xFF3DDC84)
@@ -93,6 +83,33 @@
     val Plain = Color(0xFFC9D1EE)
     val Comment = Color(0xFF64748B)
 
+    // Badge color for work in progress
+    val Amber = Color(0xFFFBBF24)
+
+    val SITE = "https://fast-compose.github.io/"
+
+    @Composable
+    fun AppTheme(content: @Composable () -> Unit) {
+        val colors = darkColorScheme(
+            primary = Color(0xFF3DDC84),
+            onPrimary = Color(0xFF04121F),
+            secondary = Color(0xFF3B82F6),
+            onSecondary = Color.White,
+            tertiary = Color(0xFF5B4BD6),
+            onTertiary = Color.White,
+            background = Color(0xFF0B1020),
+            onBackground = Color(0xFFE6E9F5),
+            surface = Color(0xFF111832),
+            onSurface = Color(0xFFE6E9F5),
+            onSurfaceVariant = Color(0xFF98A2C3),
+            surfaceContainerLowest = Color(0xFF070B17),
+            outline = Color(0xFF222B4A),
+            outlineVariant = Color(0xFF64748B),
+            error = Color(0xFFF87171)
+        )
+        MaterialTheme(colorScheme = colors) { content() }
+    }
+
     data class Step(val title: String, val text: String)
     data class Command(val command: String, val output: String)
 
@@ -100,6 +117,12 @@
 
     @Composable
     fun Home() {
+        AppTheme { Page() }
+    }
+
+    @Composable
+    fun Page() {
+        val colors = MaterialTheme.colorScheme
         val scroll = rememberScrollState()
         val scope = rememberCoroutineScope()
         val uri = LocalUriHandler.current
@@ -113,23 +136,22 @@
             Modifier.onGloballyPositioned { sections[key] = it.positionInRoot().y + scroll.value }
         }
 
-        MaterialTheme(colorScheme = darkColorScheme(primary = Green, background = Bg, surface = Bg2)) {
-            BoxWithConstraints(Modifier.fillMaxSize().background(Bg)) {
-                val wide = maxWidth > 860.dp
-                val cols = if (maxWidth > 860.dp) 4 else if (maxWidth > 560.dp) 2 else 1
-                Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
-                    Spacer(Modifier.height(64.dp))
-                    Hero(wide, open)
-                    WhatSection(cols, mark("what"))
-                    PlaygroundSection(wide, mark("playground"), open)
-                    ScriptSection(wide, mark("script"), open)
-                    PluginSection(wide, mark("plugin"), open)
-                    LibrarySection(wide, mark("library"), open)
-                    CliSection(wide, mark("cli"), open)
-                    Footer(open)
-                }
-                NavBar(wide, goTo, open, onTop = { scope.launch { scroll.animateScrollTo(0) } })
+        BoxWithConstraints(Modifier.fillMaxSize().background(colors.background)) {
+            val wide = maxWidth > 860.dp
+            val cols = if (maxWidth > 860.dp) 4 else if (maxWidth > 560.dp) 2 else 1
+            Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+                Spacer(Modifier.height(64.dp))
+                Hero(wide, open)
+                WhatSection(cols, mark("what"))
+                PlaygroundSection(wide, mark("playground"), open)
+                ScriptSection(wide, mark("script"), open)
+                PluginSection(wide, mark("plugin"), open)
+                VsCodeSection(wide, mark("vscode"), open)
+                LibrarySection(wide, mark("library"), open)
+                CliSection(wide, mark("cli"), open)
+                Footer(open)
             }
+            NavBar(wide, goTo, open, onTop = { scope.launch { scroll.animateScrollTo(0) } })
         }
     }
 
@@ -147,7 +169,7 @@
     @Composable
     fun Section(modifier: Modifier, vertical: Dp = 64.dp, content: @Composable () -> Unit) {
         Column(modifier.fillMaxWidth()) {
-            HorizontalDivider(color = Line)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             Container(Modifier.padding(vertical = vertical)) { content() }
         }
     }
@@ -170,26 +192,36 @@
     @Composable
     fun Eyebrow(text: String) {
         Text(
-            text.uppercase(), color = Green, fontSize = 13.sp,
+            text.uppercase(),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold, letterSpacing = 2.sp
         )
     }
 
     @Composable
-    fun Title(text: String, badge: String = "", badgeColor: Color = Green) {
+    fun Title(text: String, badge: String = "", badgeColor: Color? = null) {
+        val tint = badgeColor ?: MaterialTheme.colorScheme.primary
         FlowRow(
             Modifier.padding(top = 8.dp, bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             itemVerticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text, color = Ink, fontSize = 34.sp, lineHeight = 40.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            )
             if (badge.isNotEmpty()) {
                 Text(
-                    badge, color = badgeColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
+                    badge,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = tint, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .background(badgeColor.copy(alpha = 0.15f))
+                        .background(tint.copy(alpha = 0.15f))
                         .padding(horizontal = 10.dp, vertical = 3.dp)
                 )
             }
@@ -199,31 +231,37 @@
     @Composable
     fun Lead(text: String) {
         Text(
-            text, color = Muted, fontSize = 18.sp, lineHeight = 28.sp,
+            text,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Normal, fontSize = 18.sp, lineHeight = 28.sp,
             modifier = Modifier.widthIn(max = 760.dp).padding(bottom = 28.dp)
         )
     }
 
     @Composable
     fun Check(bold: String, rest: String) {
+        val colors = MaterialTheme.colorScheme
         Row(Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.Top) {
             Box(
                 Modifier.padding(top = 5.dp).size(14.dp).clip(RoundedCornerShape(4.dp))
-                    .background(brush = Brush.linearGradient(listOf(Green, Blue)))
+                    .background(brush = Brush.linearGradient(listOf(colors.primary, colors.secondary)))
             )
             Spacer(Modifier.width(12.dp))
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(color = Ink, fontWeight = FontWeight.SemiBold)) { append(bold) }
+                    withStyle(SpanStyle(color = colors.onSurface, fontWeight = FontWeight.SemiBold)) { append(bold) }
                     append(" " + rest)
                 },
-                color = Muted, fontSize = 16.sp, lineHeight = 24.sp
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.onSurfaceVariant
             )
         }
     }
 
     @Composable
     fun PrimaryButton(text: String, onClick: () -> Unit) {
+        val colors = MaterialTheme.colorScheme
         val source = remember { MutableInteractionSource() }
         val hovered by source.collectIsHoveredAsState()
         val lift by animateDpAsState(if (hovered) (-2).dp else 0.dp, label = "lift")
@@ -231,21 +269,22 @@
             Modifier
                 .offset(y = lift)
                 .clip(RoundedCornerShape(50))
-                .background(brush = Brush.horizontalGradient(listOf(Green, Blue)))
+                .background(brush = Brush.horizontalGradient(listOf(colors.primary, colors.secondary)))
                 .hoverable(source)
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clickable(onClick = onClick)
                 .padding(horizontal = 22.dp, vertical = 12.dp)
         ) {
-            Text(text, color = Color(0xFF04121F), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(text, style = MaterialTheme.typography.labelLarge, color = colors.onPrimary, fontWeight = FontWeight.Bold)
         }
     }
 
     @Composable
     fun GhostButton(text: String, onClick: () -> Unit) {
+        val colors = MaterialTheme.colorScheme
         val source = remember { MutableInteractionSource() }
         val hovered by source.collectIsHoveredAsState()
-        val border by animateColorAsState(if (hovered) Muted else Line, label = "border")
+        val border by animateColorAsState(if (hovered) colors.onSurfaceVariant else colors.outline, label = "border")
         Box(
             Modifier
                 .clip(RoundedCornerShape(50))
@@ -255,7 +294,7 @@
                 .clickable(onClick = onClick)
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            Text(text, color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(text, style = MaterialTheme.typography.labelLarge, color = colors.onSurface, fontWeight = FontWeight.SemiBold)
         }
     }
 
@@ -269,16 +308,18 @@
 
     @Composable
     fun CodeBlock(parts: List<Pair<String, Color>>) {
+        val colors = MaterialTheme.colorScheme
         val code = buildAnnotatedString {
             parts.forEach { p -> withStyle(SpanStyle(color = p.second)) { append(p.first) } }
         }
+        val hScroll = rememberScrollState()
         Box(
             Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(CodeBg)
-                .border(1.dp, Line, RoundedCornerShape(14.dp))
-                .horizontalScroll(rememberScrollState())
+                .background(colors.surfaceContainerLowest)
+                .border(1.dp, colors.outline, RoundedCornerShape(14.dp))
+                .horizontalScroll(hScroll)
                 .padding(18.dp)
         ) {
             SelectionContainer {
@@ -302,10 +343,35 @@
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF22C55E)))
                 Spacer(Modifier.width(8.dp))
-                Text(label, color = Color(0xFF64748B), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(label, style = MaterialTheme.typography.labelLarge, color = Color(0xFF64748B))
             }
             Spacer(Modifier.height(16.dp))
             MaterialTheme(colorScheme = lightColorScheme()) { content() }
+        }
+    }
+
+    @Composable
+    fun Screenshot(image: String, caption: String, ratio: Float) {
+        val colors = MaterialTheme.colorScheme
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = SITE + image,
+                contentDescription = caption,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(ratio)
+                    .shadow(24.dp, RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.outline, RoundedCornerShape(16.dp))
+            )
+            Text(
+                caption,
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(top = 12.dp)
+            )
         }
     }
 
@@ -313,23 +379,29 @@
 
     @Composable
     fun NavLink(text: String, onClick: () -> Unit) {
+        val colors = MaterialTheme.colorScheme
         val source = remember { MutableInteractionSource() }
         val hovered by source.collectIsHoveredAsState()
-        val color by animateColorAsState(if (hovered) Ink else Muted, label = "link")
+        val color by animateColorAsState(if (hovered) colors.onSurface else colors.onSurfaceVariant, label = "link")
         Text(
-            text, color = color, fontSize = 15.sp,
+            text, style = MaterialTheme.typography.bodyLarge, color = color,
             modifier = Modifier.hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = onClick)
         )
     }
 
     @Composable
     fun Logo(size: Dp) {
-        AsyncImage(model = "https://raw.githubusercontent.com/fast-compose/fast-compose/main/docs/images/logo.png", contentDescription = "Fast Compose logo", modifier = Modifier.size(size))
+        AsyncImage(
+            model = "https://raw.githubusercontent.com/fast-compose/fast-compose/main/docs/images/logo.png",
+            contentDescription = "Fast Compose logo",
+            modifier = Modifier.size(size)
+        )
     }
 
     @Composable
     fun NavBar(wide: Boolean, goTo: (String) -> Unit, open: (String) -> Unit, onTop: () -> Unit) {
-        Column(Modifier.fillMaxWidth().background(Color(0xE60B1020))) {
+        val colors = MaterialTheme.colorScheme
+        Column(Modifier.fillMaxWidth().background(colors.background.copy(alpha = 0.9f))) {
             Container {
                 Row(Modifier.height(64.dp), verticalAlignment = Alignment.CenterVertically) {
                     Row(
@@ -338,15 +410,16 @@
                     ) {
                         Logo(32.dp)
                         Spacer(Modifier.width(10.dp))
-                        Text("Fast Compose", color = Ink, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                        Text("Fast Compose", style = MaterialTheme.typography.titleMedium, color = colors.onSurface, fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.weight(1f))
                     if (wide) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                             NavLink("What it is") { goTo("what") }
                             NavLink("Playground") { goTo("playground") }
                             NavLink("Compose Script") { goTo("script") }
                             NavLink("Plugin") { goTo("plugin") }
+                            NavLink("VS Code") { goTo("vscode") }
                             NavLink("Library") { goTo("library") }
                             NavLink("CLI") { goTo("cli") }
                             NavLink("GitHub") { open("https://github.com/fast-compose") }
@@ -356,7 +429,7 @@
                     }
                 }
             }
-            HorizontalDivider(color = Line)
+            HorizontalDivider(color = colors.outline)
         }
     }
 
@@ -364,10 +437,11 @@
 
     @Composable
     fun Hero(wide: Boolean, open: (String) -> Unit) {
+        val colors = MaterialTheme.colorScheme
         Box(
             Modifier.fillMaxWidth().background(
                 brush = Brush.radialGradient(
-                    listOf(Color(0x335B4BD6), Color(0x00000000)),
+                    listOf(colors.tertiary.copy(alpha = 0.2f), Color.Transparent),
                     radius = 900f
                 )
             )
@@ -388,20 +462,22 @@
 
     @Composable
     fun HeroText(wide: Boolean, open: (String) -> Unit) {
-        val big = if (wide) 60.sp else 40.sp
-        val line = if (wide) 64.sp else 44.sp
+        val colors = MaterialTheme.colorScheme
+        val headline = if (wide) MaterialTheme.typography.displayLarge else MaterialTheme.typography.displaySmall
         Column {
             if (!wide) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Logo(160.dp) }
                 Spacer(Modifier.height(24.dp))
             }
-            Text("Jetpack Compose,", color = Ink, fontSize = big, lineHeight = line, fontWeight = FontWeight.ExtraBold)
-            Text("rendered instantly.", color = Green, fontSize = big, lineHeight = line, fontWeight = FontWeight.ExtraBold)
+            Text("Jetpack Compose,", style = headline, color = colors.onBackground, fontWeight = FontWeight.ExtraBold)
+            Text("rendered instantly.", style = headline, color = colors.primary, fontWeight = FontWeight.ExtraBold)
             Spacer(Modifier.height(16.dp))
             Text(
                 "Fast Compose is an instant runtime for Jetpack Compose code. Write Compose, see it render in " +
                     "milliseconds, on Android, iOS, desktop and the web.",
-                color = Muted, fontSize = 19.sp, lineHeight = 29.sp, modifier = Modifier.widthIn(max = 560.dp)
+                style = MaterialTheme.typography.titleLarge,
+                color = colors.onSurfaceVariant, fontWeight = FontWeight.Normal, lineHeight = 30.sp,
+                modifier = Modifier.widthIn(max = 560.dp)
             )
             Spacer(Modifier.height(28.dp))
             Buttons {
@@ -415,25 +491,27 @@
 
     @Composable
     fun PoweredBy(open: (String) -> Unit) {
+        val colors = MaterialTheme.colorScheme
         Row(
             Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(Color(0x143DDC84))
-                .border(1.dp, Color(0x663DDC84), RoundedCornerShape(12.dp))
+                .background(colors.primary.copy(alpha = 0.08f))
+                .border(1.dp, colors.primary.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
                 .pointerHoverIcon(PointerIcon.Hand)
                 .clickable { open("https://github.com/fast-compose/fast-compose.github.io/blob/main/index.html") }
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.size(8.dp).clip(CircleShape).background(Green))
+            Box(Modifier.size(8.dp).clip(CircleShape).background(colors.primary))
             Spacer(Modifier.width(10.dp))
             Text(
                 buildAnnotatedString {
                     append("This whole page is one Compose app, rendered by ")
-                    withStyle(SpanStyle(color = Green, fontFamily = FontFamily.Monospace)) { append("compose-script") }
+                    withStyle(SpanStyle(color = colors.primary, fontFamily = FontFamily.Monospace)) { append("compose-script") }
                     append(". View source →")
                 },
-                color = Muted, fontSize = 14.sp
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurfaceVariant
             )
         }
     }
@@ -453,7 +531,9 @@
             Text(
                 "Fast Compose reads Compose source code like a browser reads HTML and runs it with the real Compose " +
                     "runtime. No Kotlin compiler, no Gradle, no server.",
-                color = Ink, fontSize = 18.sp, lineHeight = 27.sp,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Normal, fontSize = 18.sp, lineHeight = 27.sp,
                 modifier = Modifier.widthIn(max = 820.dp).padding(top = 8.dp, bottom = 20.dp)
             )
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -476,40 +556,43 @@
 
     @Composable
     fun StepCard(number: Int, step: Step, modifier: Modifier) {
+        val colors = MaterialTheme.colorScheme
         Row(
             modifier
                 .clip(RoundedCornerShape(14.dp))
-                .background(Bg2)
-                .border(1.dp, Line, RoundedCornerShape(14.dp))
+                .background(colors.surface)
+                .border(1.dp, colors.outline, RoundedCornerShape(14.dp))
                 .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 Modifier.size(28.dp).clip(RoundedCornerShape(8.dp))
-                    .background(brush = Brush.linearGradient(listOf(Green, Indigo))),
+                    .background(brush = Brush.linearGradient(listOf(colors.primary, colors.tertiary))),
                 contentAlignment = Alignment.Center
             ) {
-                Text("$number", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("$number", style = MaterialTheme.typography.labelLarge, color = Color.White, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.width(12.dp))
             Column {
-                Text(step.title, color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(step.text, color = Muted, fontSize = 13.sp, lineHeight = 18.sp)
+                Text(step.title, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, fontWeight = FontWeight.Bold)
+                Text(step.text, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
             }
         }
     }
 
     @Composable
     fun FlowLine() {
-        val strike = SpanStyle(color = Red, textDecoration = TextDecoration.LineThrough)
-        val bold = SpanStyle(color = Ink, fontWeight = FontWeight.SemiBold)
+        val colors = MaterialTheme.colorScheme
+        val strike = SpanStyle(color = colors.error, textDecoration = TextDecoration.LineThrough)
+        val bold = SpanStyle(color = colors.onSurface, fontWeight = FontWeight.SemiBold)
+        val hScroll = rememberScrollState()
         Box(
             Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(Bg2)
-                .border(1.dp, Line, RoundedCornerShape(14.dp))
-                .horizontalScroll(rememberScrollState())
+                .background(colors.surface)
+                .border(1.dp, colors.outline, RoundedCornerShape(14.dp))
+                .horizontalScroll(hScroll)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             Text(
@@ -527,7 +610,7 @@
                     withStyle(bold) { append("Fast Compose: ") }
                     append("edit → 👀")
                 },
-                color = Muted, fontFamily = FontFamily.Monospace, fontSize = 14.sp, softWrap = false
+                color = colors.onSurfaceVariant, fontFamily = FontFamily.Monospace, fontSize = 14.sp, softWrap = false
             )
         }
     }
@@ -573,7 +656,7 @@
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.size(48.dp).clip(CircleShape)
-                        .background(brush = Brush.linearGradient(listOf(Green, Indigo))),
+                        .background(brush = Brush.linearGradient(listOf(Color(0xFF3DDC84), Color(0xFF5B4BD6)))),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("FC", color = Color.White, fontWeight = FontWeight.Bold)
@@ -649,83 +732,97 @@
         }
     }
 
-    // ---------- plugin ----------
+    // ---------- IDE plugins ----------
 
+    // Title and buttons on the left, features on the right, the screenshot below.
     @Composable
-    fun PluginSection(wide: Boolean, modifier: Modifier, open: (String) -> Unit) {
+    fun ToolSection(
+        wide: Boolean,
+        modifier: Modifier,
+        eyebrow: String,
+        title: String,
+        lead: String,
+        features: List<Pair<String, String>>,
+        buttons: @Composable () -> Unit,
+        image: String,
+        caption: String,
+        ratio: Float
+    ) {
         Section(modifier) {
             Split(
                 wide,
                 left = {
                     Column {
-                        Eyebrow("IDE Plugin")
-                        Title("Instant previews in Android Studio.", "LIVE")
-                        Lead(
-                            "Fast Compose Preview renders the previews of the open Kotlin file as you type, in " +
-                                "Android Studio and IntelliJ IDEA. No compiler, no build, no waiting."
-                        )
-                        Check("Follows the editor,", "including unsaved text")
-                        Check("Device frames:", "phone, foldable, tablet and desktop, with zoom")
-                        Check("Your project:", "composables, classes and themes from other files, R and Res resources, network images")
-                        Check("Logs", "for parse and runtime errors; click a line to open it")
-                        Spacer(Modifier.height(28.dp))
-                        Buttons {
-                            PrimaryButton("JetBrains Marketplace →") {
-                                open("https://plugins.jetbrains.com/plugin/35776-fast-compose-preview")
-                            }
-                            GhostButton("GitHub") { open("https://github.com/fast-compose/intellij-plugin") }
-                        }
+                        Eyebrow(eyebrow)
+                        Title(title, "LIVE")
+                        Lead(lead)
+                        Buttons { buttons() }
                     }
                 },
-                right = { PreviewPanel() }
-            )
-        }
-    }
-
-    @Composable
-    fun PreviewPanel() {
-        var checked by remember { mutableStateOf(true) }
-        Column(
-            Modifier
-                .widthIn(max = 460.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF1E1F22))
-                .border(1.dp, Line, RoundedCornerShape(20.dp))
-        ) {
-            Row(Modifier.fillMaxWidth().background(Color(0xFF2B2D30)).padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Bolt, contentDescription = null, tint = Green, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Fast Compose Preview", color = Ink, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.weight(1f))
-                Text("Phone · Fit", color = Muted, fontSize = 12.sp)
-            }
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                PreviewFrame("Light", false, checked) { checked = it }
-                PreviewFrame("Dark", true, checked) { checked = it }
-            }
-        }
-    }
-
-    @Composable
-    fun PreviewFrame(name: String, dark: Boolean, checked: Boolean, onChecked: (Boolean) -> Unit) {
-        Column {
-            Text(name, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
-            MaterialTheme(colorScheme = if (dark) darkColorScheme() else lightColorScheme()) {
-                Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
-                    Card(Modifier.padding(12.dp).fillMaxWidth()) {
-                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text("Fast Compose Preview", fontWeight = FontWeight.Bold)
-                                Text("Renders as you type", style = MaterialTheme.typography.bodySmall)
-                            }
-                            Switch(checked = checked, onCheckedChange = onChecked)
-                        }
+                right = {
+                    Column(Modifier.fillMaxWidth()) {
+                        features.forEach { f -> Check(f.first, f.second) }
                     }
                 }
-            }
+            )
+            Spacer(Modifier.height(40.dp))
+            Screenshot(image, caption, ratio)
         }
+    }
+
+    @Composable
+    fun PluginSection(wide: Boolean, modifier: Modifier, open: (String) -> Unit) {
+        ToolSection(
+            wide, modifier,
+            eyebrow = "Android Studio & IntelliJ Plugin",
+            title = "Instant previews in Android Studio.",
+            lead = "Fast Compose Preview renders the previews of the open Kotlin file as you type, in Android Studio " +
+                "and IntelliJ IDEA. No compiler, no build, no waiting.",
+            features = listOf(
+                "Follows the editor," to "including unsaved text",
+                "Device frames:" to "phone, foldable, tablet and desktop, with zoom",
+                "Your project:" to "composables, classes and themes from other files, R and Res resources, network images",
+                "Logs" to "for parse and runtime errors; click a line to open it",
+                "Own window:" to "move the preview to a second display"
+            ),
+            buttons = {
+                PrimaryButton("JetBrains Marketplace →") {
+                    open("https://plugins.jetbrains.com/plugin/35776-fast-compose-preview")
+                }
+                GhostButton("GitHub") { open("https://github.com/fast-compose/intellij-plugin") }
+            },
+            image = "images/android-studio-plugin.jpg",
+            caption = "Fast Compose Preview beside the editor in Android Studio",
+            ratio = 1600f / 850f
+        )
+    }
+
+    @Composable
+    fun VsCodeSection(wide: Boolean, modifier: Modifier, open: (String) -> Unit) {
+        ToolSection(
+            wide, modifier,
+            eyebrow = "VS Code Extension",
+            title = "Compose previews in VS Code.",
+            lead = "The same instant previews in VS Code: open a Kotlin file and click Preview above any @Preview " +
+                "function. No Android Studio, no Gradle sync.",
+            features = listOf(
+                "Preview links" to "above every @Preview function",
+                "Follows the editor," to "including unsaved text, and VS Code's light or dark theme",
+                "Device frames:" to "phone, foldable, tablet and desktop, with zoom",
+                "Your workspace:" to "other files, Gradle modules, R and Res resources, network images",
+                "Logs" to "for parse errors, runtime errors and println output"
+            ),
+            buttons = {
+                PrimaryButton("VS Code Marketplace →") {
+                    open("https://marketplace.visualstudio.com/items?itemName=fast-compose.fast-compose-preview")
+                }
+                GhostButton("Open VSX") { open("https://open-vsx.org/extension/fast-compose/fast-compose-preview") }
+                GhostButton("GitHub") { open("https://github.com/fast-compose/vscode-extension") }
+            },
+            image = "images/vscode-extension.jpg",
+            caption = "Fast Compose Preview to the side of a Kotlin file in VS Code",
+            ratio = 1600f / 821f
+        )
     }
 
     // ---------- kmp library ----------
@@ -795,9 +892,9 @@
     @Composable
     fun CliSection(wide: Boolean, modifier: Modifier, open: (String) -> Unit) {
         val commands = listOf(
-            Command("fast-compose check file.kt", "Parse errors and unknown names as JSON"),
-            Command("fast-compose render file.kt", "A PNG per @Preview"),
-            Command("fast-compose list file.kt", "The previews in a file"),
+            Command("fast-compose check <paths>", "Parse errors, unknown names and runtime errors"),
+            Command("fast-compose render <paths> -o out/", "A PNG per @Preview"),
+            Command("fast-compose list <paths>", "The previews in each file"),
             Command("fast-compose mcp", "An MCP server for AI agents")
         )
         Section(modifier) {
@@ -808,8 +905,9 @@
                         Eyebrow("CLI & MCP")
                         Title("Compose for the terminal and AI agents.", "COMING SOON", Amber)
                         Lead(
-                            "compose-cli checks and renders Compose previews from the terminal, or as an MCP server " +
-                                "that AI agents call while they write UI code. No Gradle, no compiler, no Android Studio."
+                            "compose-cli checks and renders Compose previews from the terminal, in CI, or as an MCP " +
+                                "server that AI agents call while they write UI code. No Gradle, no compiler, no " +
+                                "Android Studio."
                         )
                         Buttons {
                             GhostButton("Follow on GitHub") { open("https://github.com/fast-compose/compose-cli") }
@@ -823,6 +921,7 @@
 
     @Composable
     fun Terminal(commands: List<Command>) {
+        val colors = MaterialTheme.colorScheme
         val blink by rememberInfiniteTransition(label = "cursor").animateFloat(
             initialValue = 0f, targetValue = 1f,
             animationSpec = infiniteRepeatable(tween(600), repeatMode = RepeatMode.Reverse),
@@ -833,10 +932,13 @@
                 .widthIn(max = 520.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(CodeBg)
-                .border(1.dp, Line, RoundedCornerShape(16.dp))
+                .background(colors.surfaceContainerLowest)
+                .border(1.dp, colors.outline, RoundedCornerShape(16.dp))
         ) {
-            Row(Modifier.fillMaxWidth().background(Bg2).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                Modifier.fillMaxWidth().background(colors.surface).padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFFFF5F57)))
                 Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFFFEBC2E)))
                 Box(Modifier.size(12.dp).clip(CircleShape).background(Color(0xFF28C840)))
@@ -846,17 +948,17 @@
                     Column {
                         Text(
                             buildAnnotatedString {
-                                withStyle(SpanStyle(color = Green)) { append("$ ") }
+                                withStyle(SpanStyle(color = colors.primary)) { append("$ ") }
                                 append(c.command)
                             },
-                            color = Ink, fontFamily = FontFamily.Monospace, fontSize = 14.sp
+                            color = colors.onSurface, fontFamily = FontFamily.Monospace, fontSize = 14.sp
                         )
                         Text("  " + c.output, color = Comment, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("$ ", color = Green, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
-                    Box(Modifier.size(width = 9.dp, height = 18.dp).alpha(blink).background(Ink))
+                    Text("$ ", color = colors.primary, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+                    Box(Modifier.size(width = 9.dp, height = 18.dp).alpha(blink).background(colors.onSurface))
                 }
             }
         }
@@ -866,8 +968,9 @@
 
     @Composable
     fun Footer(open: (String) -> Unit) {
+        val colors = MaterialTheme.colorScheme
         Column(Modifier.fillMaxWidth()) {
-            HorizontalDivider(color = Line)
+            HorizontalDivider(color = colors.outline)
             Container(Modifier.padding(top = 32.dp, bottom = 48.dp)) {
                 FlowRow(
                     Modifier.fillMaxWidth(),
@@ -878,12 +981,12 @@
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Logo(28.dp)
                         Spacer(Modifier.width(10.dp))
-                        Text("Fast Compose", color = Ink, fontWeight = FontWeight.Bold)
+                        Text("Fast Compose", style = MaterialTheme.typography.titleMedium, color = colors.onSurface, fontWeight = FontWeight.Bold)
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
                         NavLink("Built with compose-script") { open("https://github.com/fast-compose/compose-script") }
                         NavLink("GitHub") { open("https://github.com/fast-compose") }
-                        Text("Apache 2.0", color = Muted, fontSize = 15.sp)
+                        Text("Apache 2.0", style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant)
                     }
                 }
             }

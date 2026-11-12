@@ -14,13 +14,13 @@
 
 | Path | Page |
 |---|---|
-| [`/`](https://fast-compose.github.io) | Home page: what Fast Compose is, the playground, compose-script, the IDE plugin, the KMP library and the CLI |
+| [`/`](https://fast-compose.github.io) | Home page: what Fast Compose is, the playground, compose-script, the Android Studio plugin, the VS Code extension, the KMP library and the CLI |
 | [`/playground/`](https://fast-compose.github.io/playground/) | [Fast Compose Playground](https://github.com/fast-compose/playground): run Jetpack Compose online |
 
 ## Home page
 
 The home page is one Compose app inside a single `<script type="text/compose-content">` tag in
-[`index.html`](index.html), rendered by [compose-script](https://github.com/fast-compose/compose-script). The HTML
+[`index.html`](index.html), rendered by [compose-script](https://github.com/fast-compose/compose-script), styled by an `AppTheme` Material 3 theme. The HTML
 holds only the meta tags, a loader shown until compose-script starts, and a `<noscript>` fallback with links.
 
 ## Files
@@ -29,6 +29,7 @@ holds only the meta tags, a loader shown until compose-script starts, and a `<no
 |---|---|
 | `index.html` | The home page |
 | `logo.png` | The Fast Compose logo, used by the loader and link previews |
+| `images/` | Screenshots of the Android Studio plugin and the VS Code extension |
 | `playground/` | The playground's web build |
 | `sitemap.xml` | Lists the home page and the playground for search engines |
 | `robots.txt` | Allows all crawlers and points to the sitemap |
