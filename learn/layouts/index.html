@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetpack Compose Column, Row and Box - Learn Compose with Live Examples</title>
+    <meta name="description"
+          content="Learn Jetpack Compose layouts: Column places elements below each other, Row beside each other, and Box on top of each other. Live examples with Arrangement and Alignment.">
+    <meta name="keywords"
+          content="Jetpack Compose Column, Jetpack Compose Row, Jetpack Compose Box, Arrangement.spacedBy, Alignment, Compose layout tutorial">
+    <link rel="canonical" href="https://fast-compose.github.io/learn/layouts/">
+    <meta name="theme-color" content="#0B1020">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Fast Compose">
+    <meta property="og:title" content="Jetpack Compose Column, Row and Box - Live Examples">
+    <meta property="og:description" content="Place elements below, beside and on top of each other in Jetpack Compose, with examples that run in your browser.">
+    <meta property="og:url" content="https://fast-compose.github.io/learn/layouts/">
+    <meta property="og:image" content="https://fast-compose.github.io/logo.png">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" type="image/png" href="../../playground/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="../../logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../learn.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fast-compose/compose-script@0.2.0/compose-script.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="../../"><img src="../../logo.png" alt="">Fast Compose</a>
+        <nav>
+            <a class="active" href="../">Learn</a>
+            <a href="../../playground/">Playground</a>
+            <a class="wide-only" href="https://github.com/fast-compose/fast-compose">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <h2>Lessons</h2>
+            <ol>
+                <li><a href="../">Introduction</a></li>
+                <li><a href="../text/">1. Text</a></li>
+                <li><a class="active" href="../layouts/">2. Column, Row and Box</a></li>
+                <li><a href="../state/">3. Button and State</a></li>
+            </ol>
+        </div>
+    </aside>
+
+    <main>
+        <p class="eyebrow">Lesson 2</p>
+        <h1>Column, Row and Box</h1>
+        <p class="lead">Three layouts place almost everything in Compose: <code>Column</code> stacks elements
+            vertically, <code>Row</code> places them side by side, and <code>Box</code> layers them on top of
+            each other.</p>
+
+        <h2>Column</h2>
+        <p>A <code>Column</code> places its children below each other. <code>Arrangement.spacedBy</code> adds
+            the same space between them:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Column(
+                    Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("First")
+                    Text("Second")
+                    Text("Third")
+                }
+            </script>
+        </div>
+
+        <p>The children go inside the braces <code>{ }</code> after the parentheses. This trailing lambda is how
+            every layout in Compose takes its content.</p>
+
+        <h2>Row</h2>
+        <p>A <code>Row</code> places its children side by side. Here a circle sits beside a
+            <code>Column</code> of two texts, and <code>verticalAlignment</code> centers them vertically:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Row(
+                    Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(Modifier.size(48.dp).background(Color(0xFF3DDC84), CircleShape))
+                    Column {
+                        Text("Ada Lovelace", fontWeight = FontWeight.Bold)
+                        Text("Engineer", color = Color.Gray)
+                    }
+                }
+            </script>
+        </div>
+
+        <p>Layouts nest inside each other, so a few <code>Row</code>s and <code>Column</code>s can build most
+            screens.</p>
+
+        <h2>Box</h2>
+        <p>A <code>Box</code> places its children on top of each other. <code>contentAlignment</code> sets where
+            they go, and <code>Modifier.align</code> moves a single child:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Box(
+                    Modifier.size(160.dp).background(Color(0xFF5B4BD6), RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Center", color = Color.White)
+                    Text("Top start", color = Color.White, modifier = Modifier.align(Alignment.TopStart).padding(8.dp))
+                }
+            </script>
+        </div>
+
+        <h2>Arrangement and alignment</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Layout</th><th>Main direction</th><th>Other direction</th></tr>
+                <tr><td><code>Column</code></td><td><code>verticalArrangement</code></td><td><code>horizontalAlignment</code></td></tr>
+                <tr><td><code>Row</code></td><td><code>horizontalArrangement</code></td><td><code>verticalAlignment</code></td></tr>
+                <tr><td><code>Box</code></td><td colspan="2"><code>contentAlignment</code>, or <code>Modifier.align</code> on a child</td></tr>
+            </table>
+        </div>
+
+        <h2>Summary</h2>
+        <ul class="points">
+            <li><code>Column</code>: below each other.</li>
+            <li><code>Row</code>: side by side.</li>
+            <li><code>Box</code>: on top of each other.</li>
+            <li>Arrangement spaces children along the main direction; alignment positions them across it.</li>
+        </ul>
+
+        <nav class="pager">
+            <a href="../text/"><span class="dir">Previous</span>&laquo; 1. Text</a>
+            <a class="next" href="../state/"><span class="dir">Next</span>3. Button and State &raquo;</a>
+        </nav>
+    </main>
+</div>
+
+<footer>
+    <a href="../../">Fast Compose</a> &middot; Open source under the Apache 2.0 license
+</footer>
+
+<script src="../learn.js"></script>
+</body>
+</html>

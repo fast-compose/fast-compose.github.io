@@ -63,7 +63,8 @@
         compose-script and needs JavaScript and WebAssembly.</p>
     <ul>
         <li><a href="playground/">Playground</a>: run Jetpack Compose online.</li>
-        <li><a href="https://github.com/fast-compose/compose-script">Compose Script</a>: live Compose inside any web page.</li>
+        <li><a href="learn/">Learn</a>: Jetpack Compose lessons with live examples.</li>
+        <li><a href="https://github.com/fast-compose/compose-script">Compose Script</a>: live Compose inside any web page. <a href="try/">Try it online</a>.</li>
         <li><a href="https://plugins.jetbrains.com/plugin/35776-fast-compose-preview">IDE Plugin</a>: instant previews in Android Studio and IntelliJ IDEA.</li>
         <li><a href="https://marketplace.visualstudio.com/items?itemName=fast-compose.fast-compose-preview">VS Code Extension</a>: instant previews in VS Code.</li>
         <li><a href="https://github.com/fast-compose/fast-compose/blob/main/docs/LIBRARY.md">KMP Library</a>: render Compose code at runtime in your Kotlin Multiplatform apps.</li>
@@ -417,6 +418,7 @@
                         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                             NavLink("What it is") { goTo("what") }
                             NavLink("Playground") { goTo("playground") }
+                            NavLink("Learn") { open("learn/") }
                             NavLink("Compose Script") { goTo("script") }
                             NavLink("Plugin") { goTo("plugin") }
                             NavLink("VS Code") { goTo("vscode") }
@@ -425,7 +427,10 @@
                             NavLink("GitHub") { open("https://github.com/fast-compose") }
                         }
                     } else {
-                        NavLink("GitHub") { open("https://github.com/fast-compose") }
+                        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                            NavLink("Learn") { open("learn/") }
+                            NavLink("GitHub") { open("https://github.com/fast-compose") }
+                        }
                     }
                 }
             }
@@ -713,7 +718,8 @@
                         )
                         Spacer(Modifier.height(20.dp))
                         Buttons {
-                            PrimaryButton("Get started →") { open("https://github.com/fast-compose/compose-script") }
+                            PrimaryButton("Try it online →") { open("try/") }
+                            GhostButton("Get started") { open("https://github.com/fast-compose/compose-script") }
                             GhostButton("npm") { open("https://www.npmjs.com/package/@fast-compose/compose-script") }
                         }
                     }

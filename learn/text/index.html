@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetpack Compose Text - Learn Compose with Live Examples</title>
+    <meta name="description"
+          content="Learn the Jetpack Compose Text composable: show text, change its font size, color, weight and style, and limit it to a number of lines. Live examples you can edit.">
+    <meta name="keywords"
+          content="Jetpack Compose Text, Compose Text example, fontSize, fontWeight, TextOverflow, maxLines, Compose tutorial">
+    <link rel="canonical" href="https://fast-compose.github.io/learn/text/">
+    <meta name="theme-color" content="#0B1020">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Fast Compose">
+    <meta property="og:title" content="Jetpack Compose Text - Live Examples">
+    <meta property="og:description" content="Show and style text in Jetpack Compose, with examples that run in your browser.">
+    <meta property="og:url" content="https://fast-compose.github.io/learn/text/">
+    <meta property="og:image" content="https://fast-compose.github.io/logo.png">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" type="image/png" href="../../playground/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="../../logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../learn.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fast-compose/compose-script@0.2.0/compose-script.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="../../"><img src="../../logo.png" alt="">Fast Compose</a>
+        <nav>
+            <a class="active" href="../">Learn</a>
+            <a href="../../playground/">Playground</a>
+            <a class="wide-only" href="https://github.com/fast-compose/fast-compose">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <h2>Lessons</h2>
+            <ol>
+                <li><a href="../">Introduction</a></li>
+                <li><a class="active" href="../text/">1. Text</a></li>
+                <li><a href="../layouts/">2. Column, Row and Box</a></li>
+                <li><a href="../state/">3. Button and State</a></li>
+            </ol>
+        </div>
+    </aside>
+
+    <main>
+        <p class="eyebrow">Lesson 1</p>
+        <h1>Text</h1>
+        <p class="lead"><code>Text</code> shows a piece of text on the screen. It's the first composable most
+            people learn.</p>
+
+        <h2>Show text</h2>
+        <p>Call <code>Text</code> with the string you want to show:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Text("Hello, Compose!")
+            </script>
+        </div>
+
+        <p><code>Text</code> is a <strong>composable function</strong>: a Kotlin function that describes part of
+            the UI. Composable names start with a capital letter.</p>
+
+        <h2>Size, color and style</h2>
+        <p>Named parameters change how the text looks. Sizes for text use <code>sp</code>, a unit that follows
+            the user's font size setting.</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Column(Modifier.padding(16.dp)) {
+                    Text("Big and bold", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                    Text("Colored text", color = Color(0xFF3DDC84), fontSize = 20.sp)
+                    Text("Italic and gray", fontStyle = FontStyle.Italic, color = Color.Gray)
+                }
+            </script>
+        </div>
+
+        <p>The <code>Column</code> puts the three texts below each other. You'll learn it in the next lesson.</p>
+
+        <div class="table-wrap">
+            <table>
+                <tr><th>Parameter</th><th>What it does</th><th>Example</th></tr>
+                <tr><td><code>fontSize</code></td><td>Size of the letters</td><td><code>fontSize = 20.sp</code></td></tr>
+                <tr><td><code>color</code></td><td>Color of the text</td><td><code>color = Color.Red</code></td></tr>
+                <tr><td><code>fontWeight</code></td><td>How thick the letters are</td><td><code>fontWeight = FontWeight.Bold</code></td></tr>
+                <tr><td><code>fontStyle</code></td><td>Normal or italic</td><td><code>fontStyle = FontStyle.Italic</code></td></tr>
+                <tr><td><code>textAlign</code></td><td>Alignment inside its width</td><td><code>textAlign = TextAlign.Center</code></td></tr>
+            </table>
+        </div>
+
+        <h2>Limit the number of lines</h2>
+        <p>Long text wraps onto new lines. To keep it on one line, set <code>maxLines</code>, and use
+            <code>overflow</code> to end it with an ellipsis (…) when it doesn't fit:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Text(
+                    "This is a long sentence that doesn't fit in one line, so it ends with an ellipsis.",
+                    modifier = Modifier.width(220.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            </script>
+        </div>
+
+        <p><code>Modifier.width(220.dp)</code> gives the text a fixed width. Modifiers change the size, spacing
+            and look of any composable.</p>
+
+        <h2>Summary</h2>
+        <ul class="points">
+            <li><code>Text("…")</code> shows text.</li>
+            <li>Named parameters like <code>fontSize</code>, <code>color</code> and <code>fontWeight</code> style it.</li>
+            <li><code>maxLines</code> and <code>overflow</code> control long text.</li>
+        </ul>
+
+        <nav class="pager">
+            <a href="../"><span class="dir">Previous</span>&laquo; Introduction</a>
+            <a class="next" href="../layouts/"><span class="dir">Next</span>2. Column, Row and Box &raquo;</a>
+        </nav>
+    </main>
+</div>
+
+<footer>
+    <a href="../../">Fast Compose</a> &middot; Open source under the Apache 2.0 license
+</footer>
+
+<script src="../learn.js"></script>
+</body>
+</html>

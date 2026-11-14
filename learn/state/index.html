@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetpack Compose Button and State - Learn Compose with Live Examples</title>
+    <meta name="description"
+          content="Learn Jetpack Compose buttons and state: handle clicks with onClick, keep values with remember and mutableStateOf, and watch the screen update. Live examples you can click.">
+    <meta name="keywords"
+          content="Jetpack Compose Button, Compose state, remember, mutableStateOf, onClick, IconButton, recomposition, Compose tutorial">
+    <link rel="canonical" href="https://fast-compose.github.io/learn/state/">
+    <meta name="theme-color" content="#0B1020">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Fast Compose">
+    <meta property="og:title" content="Jetpack Compose Button and State - Live Examples">
+    <meta property="og:description" content="Handle clicks and update the screen with state in Jetpack Compose, with examples that run in your browser.">
+    <meta property="og:url" content="https://fast-compose.github.io/learn/state/">
+    <meta property="og:image" content="https://fast-compose.github.io/logo.png">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" type="image/png" href="../../playground/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="../../logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../learn.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fast-compose/compose-script@0.2.0/compose-script.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="../../"><img src="../../logo.png" alt="">Fast Compose</a>
+        <nav>
+            <a class="active" href="../">Learn</a>
+            <a href="../../playground/">Playground</a>
+            <a class="wide-only" href="https://github.com/fast-compose/fast-compose">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <h2>Lessons</h2>
+            <ol>
+                <li><a href="../">Introduction</a></li>
+                <li><a href="../text/">1. Text</a></li>
+                <li><a href="../layouts/">2. Column, Row and Box</a></li>
+                <li><a class="active" href="../state/">3. Button and State</a></li>
+            </ol>
+        </div>
+    </aside>
+
+    <main>
+        <p class="eyebrow">Lesson 3</p>
+        <h1>Button and State</h1>
+        <p class="lead">A UI has to react when the user taps something. In Compose, you keep the changing values
+            in <strong>state</strong>, and the screen updates whenever the state changes.</p>
+
+        <h2>Button</h2>
+        <p><code>Button</code> takes an <code>onClick</code> lambda, which runs on every click, and its content
+            in braces:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                Button(onClick = { }) {
+                    Text("Click me")
+                }
+            </script>
+        </div>
+
+        <p>This button does nothing yet, because its <code>onClick</code> is empty.</p>
+
+        <h2>State: a counter</h2>
+        <p>To show how many times the button was clicked, keep the count in state:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                var count by remember { mutableStateOf(0) }
+
+                Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Clicked $count times", fontSize = 20.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { count++ }) {
+                        Text("Click me")
+                    }
+                }
+            </script>
+        </div>
+
+        <p>Click the button above. Here's what happens:</p>
+        <ul class="points">
+            <li><code>mutableStateOf(0)</code> creates a value that Compose watches, starting at 0.</li>
+            <li><code>remember</code> keeps it when the UI is drawn again. Without it, the count would reset to 0
+                every time.</li>
+            <li><code>by</code> lets you use <code>count</code> like a normal variable.</li>
+            <li><code>count++</code> changes the state, so Compose runs the code again and shows the new number.
+                This is called <strong>recomposition</strong>.</li>
+        </ul>
+
+        <h2>State: a toggle</h2>
+        <p>State can hold any value. Here a <code>Boolean</code> switches between two looks:</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                var liked by remember { mutableStateOf(false) }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { liked = !liked }) {
+                        Icon(
+                            if (liked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = "Like",
+                            tint = if (liked) Color.Red else Color.Gray
+                        )
+                    }
+                    Text(if (liked) "Liked" else "Not liked yet")
+                }
+            </script>
+        </div>
+
+        <p>The icon, its color and the text all read <code>liked</code>, so one click updates all three.</p>
+
+        <div class="note">
+            <p><strong>The rule of state:</strong> don't change the UI directly. Change the state, and let Compose
+                redraw the UI from it.</p>
+        </div>
+
+        <h2>Summary</h2>
+        <ul class="points">
+            <li><code>Button(onClick = { … })</code> runs code on click.</li>
+            <li><code>var x by remember { mutableStateOf(…) }</code> keeps a value that can change.</li>
+            <li>Changing state updates every part of the UI that reads it.</li>
+        </ul>
+
+        <h2>Keep going</h2>
+        <p>Open the <a href="../../playground/">playground</a> to try 21 more examples: lists, dialogs, animations,
+            gestures and Canvas drawing.</p>
+
+        <nav class="pager">
+            <a href="../layouts/"><span class="dir">Previous</span>&laquo; 2. Column, Row and Box</a>
+            <a class="next" href="../../playground/"><span class="dir">Next</span>Playground &raquo;</a>
+        </nav>
+    </main>
+</div>
+
+<footer>
+    <a href="../../">Fast Compose</a> &middot; Open source under the Apache 2.0 license
+</footer>
+
+<script src="../learn.js"></script>
+</body>
+</html>

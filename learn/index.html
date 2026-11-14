@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Jetpack Compose with Live Examples - Fast Compose</title>
+    <meta name="description"
+          content="Free Jetpack Compose lessons with live examples that run in your browser. Learn Text, Column, Row, Box, Button and state, then edit every example in the playground.">
+    <meta name="keywords"
+          content="Jetpack Compose tutorial, learn Jetpack Compose, Compose examples, Compose online, Kotlin UI, Text, Column, Row, Button, remember, mutableStateOf">
+    <link rel="canonical" href="https://fast-compose.github.io/learn/">
+    <meta name="theme-color" content="#0B1020">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Fast Compose">
+    <meta property="og:title" content="Learn Jetpack Compose with Live Examples">
+    <meta property="og:description" content="Jetpack Compose lessons with examples that run in your browser. No Android Studio, no build.">
+    <meta property="og:url" content="https://fast-compose.github.io/learn/">
+    <meta property="og:image" content="https://fast-compose.github.io/logo.png">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" type="image/png" href="../playground/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="../logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="learn.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fast-compose/compose-script@0.2.0/compose-script.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="../"><img src="../logo.png" alt="">Fast Compose</a>
+        <nav>
+            <a class="active" href="./">Learn</a>
+            <a href="../playground/">Playground</a>
+            <a class="wide-only" href="https://github.com/fast-compose/fast-compose">GitHub</a>
+        </nav>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <h2>Lessons</h2>
+            <ol>
+                <li><a class="active" href="./">Introduction</a></li>
+                <li><a href="text/">1. Text</a></li>
+                <li><a href="layouts/">2. Column, Row and Box</a></li>
+                <li><a href="state/">3. Button and State</a></li>
+            </ol>
+        </div>
+    </aside>
+
+    <main>
+        <p class="eyebrow">Learn Compose</p>
+        <h1>Learn Jetpack Compose with live examples</h1>
+        <p class="lead">Short lessons where every example runs right on the page. Read the code, see the result,
+            then open it in the playground and change it.</p>
+
+        <div class="example">
+            <script type="text/compose-content">
+                var count by remember { mutableStateOf(0) }
+
+                Button(onClick = { count++ }) {
+                    Text("You clicked $count times")
+                }
+            </script>
+        </div>
+
+        <h2>What is Jetpack Compose?</h2>
+        <p>Jetpack Compose is the modern way to build user interfaces for Android, written in Kotlin. With
+            Compose Multiplatform, the same code also runs on iOS, desktop and the web.</p>
+        <p>You describe the UI with <strong>composable functions</strong>, and Compose draws it. When your data
+            changes, Compose updates the screen for you.</p>
+
+        <h2>Lessons</h2>
+        <div class="cards">
+            <a class="card" href="text/">
+                <span class="num">01</span>
+                <h3>Text</h3>
+                <p>Show text, then change its size, color, weight and style.</p>
+            </a>
+            <a class="card" href="layouts/">
+                <span class="num">02</span>
+                <h3>Column, Row and Box</h3>
+                <p>Place elements below, beside and on top of each other.</p>
+            </a>
+            <a class="card" href="state/">
+                <span class="num">03</span>
+                <h3>Button and State</h3>
+                <p>Respond to clicks and update the screen with state.</p>
+            </a>
+        </div>
+
+        <h2>How the examples work</h2>
+        <p>The examples are real Jetpack Compose code, run in your browser by
+            <a href="https://github.com/fast-compose/compose-script">compose-script</a>. It's built on
+            <a href="https://github.com/fast-compose/fast-compose">Fast Compose</a>, an interpreter that runs
+            Compose code without a compiler or a build.</p>
+        <div class="note">
+            <p>The first example takes a few seconds to load (about 5 MB, once). The examples need a recent
+                Chrome, Edge, Firefox or Safari.</p>
+        </div>
+        <p>To write Compose in your own project, use <a href="https://developer.android.com/studio">Android
+            Studio</a>, and add the <a href="https://plugins.jetbrains.com/plugin/35776-fast-compose-preview">Fast
+            Compose Preview plugin</a> to see your previews as you type.</p>
+
+        <nav class="pager">
+            <span></span>
+            <a class="next" href="text/"><span class="dir">Next</span>1. Text &raquo;</a>
+        </nav>
+    </main>
+</div>
+
+<footer>
+    <a href="../">Fast Compose</a> &middot; Open source under the Apache 2.0 license
+</footer>
+
+<script src="learn.js"></script>
+</body>
+</html>
