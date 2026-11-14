@@ -25,6 +25,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../learn/learn.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
     <style>
         html, body { height: 100%; }
         body { display: flex; flex-direction: column; overflow: hidden; }
@@ -74,11 +75,44 @@
             padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--muted);
             letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--outline);
         }
+        .editor-host { flex: 1; position: relative; min-height: 0; background: var(--code-bg); }
+        /* the plain textarea, shown only if CodeMirror can't load */
         #editor {
-            flex: 1; width: 100%; resize: none; border: 0; outline: none; margin: 0;
+            position: absolute; inset: 0; width: 100%; height: 100%; resize: none; border: 0; outline: none; margin: 0;
             padding: 16px 18px; background: var(--code-bg); color: var(--tok-plain);
             font: 14px/1.65 var(--mono); tab-size: 4; white-space: pre; overflow: auto;
         }
+
+        /* ---------- CodeMirror, in the site's colors ---------- */
+        .editor-host .CodeMirror { position: absolute; inset: 0; height: auto; font: 14px/1.65 var(--mono); }
+        .cm-s-fast.CodeMirror { background: var(--code-bg); color: var(--tok-plain); }
+        .cm-s-fast .CodeMirror-gutters { background: var(--code-bg); border-right: 1px solid var(--outline); }
+        .cm-s-fast .CodeMirror-linenumber { color: #4B5577; padding: 0 10px 0 6px; }
+        .cm-s-fast .CodeMirror-lines { padding: 14px 0; }
+        .cm-s-fast .CodeMirror-line { padding: 0 14px; }
+        .cm-s-fast .CodeMirror-cursor { border-left: 2px solid var(--primary); }
+        .cm-s-fast .CodeMirror-selected { background: rgba(125, 211, 252, .16); }
+        .cm-s-fast.CodeMirror-focused .CodeMirror-selected { background: rgba(125, 211, 252, .24); }
+        .cm-s-fast .CodeMirror-activeline-background { background: rgba(255, 255, 255, .03); }
+        .cm-s-fast .CodeMirror-matchingbracket { color: var(--primary) !important; text-decoration: underline; }
+
+        .cm-s-fast .cm-keyword { color: var(--tok-kw); }
+        .cm-s-fast .cm-atom { color: var(--tok-kw); }
+        .cm-s-fast .cm-number { color: var(--tok-num); }
+        .cm-s-fast .cm-string, .cm-s-fast .cm-string-2 { color: var(--tok-str); }
+        .cm-s-fast .cm-comment { color: var(--tok-comment); font-style: italic; }
+        .cm-s-fast .cm-meta { color: var(--tok-ann); }
+        .cm-s-fast .cm-def { color: var(--tok-fn); }
+        .cm-s-fast .cm-type, .cm-s-fast .cm-variable-3 { color: var(--tok-type); }
+        .cm-s-fast .cm-variable, .cm-s-fast .cm-variable-2, .cm-s-fast .cm-property { color: var(--tok-plain); }
+        .cm-s-fast .cm-operator, .cm-s-fast .cm-bracket { color: #94A3B8; }
+        /* overlay: capitalized names (composables, classes) and function calls, unless Kotlin already colored them */
+        .cm-s-fast .cm-ctype:not(.cm-string):not(.cm-comment):not(.cm-meta):not(.cm-def):not(.cm-keyword) { color: var(--tok-type); }
+        .cm-s-fast .cm-fncall:not(.cm-string):not(.cm-comment):not(.cm-def):not(.cm-keyword) { color: var(--tok-fn); }
+        /* HTML */
+        .cm-s-fast .cm-tag { color: var(--tok-type); }
+        .cm-s-fast .cm-attribute { color: var(--tok-ann); }
+        .cm-s-fast .cm-def.cm-tag, .cm-s-fast .cm-meta.cm-tag { color: var(--tok-type); }
         #result { flex: 1; width: 100%; border: 0; background: #FFFFFF; }
 
         @media (max-width: 760px) {
@@ -108,7 +142,9 @@
 <div class="panes">
     <div class="pane">
         <div class="pane-label" id="editor-label">Compose</div>
-        <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code"></textarea>
+        <div class="editor-host">
+            <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code"></textarea>
+        </div>
     </div>
     <div class="gutter" id="gutter" role="separator" tabindex="0" aria-label="Resize the code and result panes"
          aria-valuemin="15" aria-valuemax="85" aria-valuenow="50" title="Drag to resize, double click to reset"></div>
@@ -118,6 +154,15 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/overlay.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script>
     // Runs Compose code with compose-script. The code is the body of a composable; with "Show HTML" it is the whole
     // page that holds it. The page address keeps it as #code=… or #html=… (URL-safe Base64, without padding).
@@ -136,7 +181,7 @@
             "}"
         ].join("\n");
 
-        var editor = document.getElementById("editor");
+        var editor = createEditor(document.getElementById("editor"));
         var editorLabel = document.getElementById("editor-label");
         var showHtml = document.getElementById("show-html");
         var result = document.getElementById("result");
@@ -213,46 +258,114 @@
             return "@Preview(showBackground = true)\n@Composable\nfun Example() {\n" + indent(body, 4) + "\n}\n";
         }
 
+        // ---------- the editor ----------
+
+        // CodeMirror with Kotlin colors; the plain textarea if CodeMirror didn't load. Both get the same small API.
+        function createEditor(textarea) {
+            if (!window.CodeMirror) {
+                textarea.addEventListener("keydown", function (event) {
+                    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+                        event.preventDefault();
+                        run();
+                    } else if (event.key === "Tab" && !event.shiftKey) {
+                        event.preventDefault();
+                        document.execCommand("insertText", false, "    ");
+                    }
+                });
+                return {
+                    getValue: function () { return textarea.value; },
+                    setValue: function (value) { textarea.value = value; },
+                    setHtml: function (html) { textarea.setAttribute("aria-label", html ? "HTML code" : "Compose code"); },
+                    refresh: function () {}
+                };
+            }
+
+            // Kotlin, plus colors for capitalized names (composables, classes) and function calls.
+            CodeMirror.defineMode("compose-kotlin", function (config) {
+                return CodeMirror.overlayMode(CodeMirror.getMode(config, "text/x-kotlin"), {
+                    token: function (stream) {
+                        if (stream.match(/^[A-Z]\w*/)) return "ctype";
+                        if (stream.match(/^[a-z_]\w*(?=\s*[({])/)) return "fncall";
+                        if (stream.match(/^\w+/)) return null;
+                        stream.next();
+                        return null;
+                    }
+                }, true);
+            });
+            // HTML, with the code of compose-script tags colored as Kotlin.
+            var htmlMode = {
+                name: "htmlmixed",
+                tags: { script: [["type", /^text\/compose-(content|preview)$/i, "compose-kotlin"]] }
+            };
+
+            var cm = CodeMirror.fromTextArea(textarea, {
+                mode: "compose-kotlin",
+                theme: "fast",
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                indentWithTabs: false,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                extraKeys: {
+                    "Ctrl-Enter": function () { run(); },
+                    "Cmd-Enter": function () { run(); },
+                    "Tab": function (cm) {
+                        if (cm.somethingSelected()) cm.indentSelection("add");
+                        else cm.replaceSelection("    ");
+                    },
+                    "Shift-Tab": "indentLess"
+                }
+            });
+            var refreshing = false;
+            return {
+                getValue: function () { return cm.getValue(); },
+                setValue: function (value) { cm.setValue(value); cm.clearHistory(); },
+                setHtml: function (html) {
+                    cm.setOption("mode", html ? htmlMode : "compose-kotlin");
+                    cm.getInputField().setAttribute("aria-label", html ? "HTML code" : "Compose code");
+                },
+                // CodeMirror measures itself on window resize only, so the pane bar asks it to measure again.
+                refresh: function () {
+                    if (refreshing) return;
+                    refreshing = true;
+                    requestAnimationFrame(function () { refreshing = false; cm.refresh(); });
+                }
+            };
+        }
+
         function currentCode() {
-            if (!showHtml.checked) return editor.value;
-            return codeFromHtml(editor.value) || lastCode;
+            if (!showHtml.checked) return editor.getValue();
+            return codeFromHtml(editor.getValue()) || lastCode;
         }
 
         function run() {
-            var html = showHtml.checked ? editor.value : asHtml(editor.value);
+            var value = editor.getValue();
+            var html = showHtml.checked ? value : asHtml(value);
             result.srcdoc = html.replace("</head>", "<style>body { margin: 16px; background: #FFFFFF; }</style></head>");
             lastCode = currentCode();
-            history.replaceState(null, "", (showHtml.checked ? "#html=" : "#code=") + encode(editor.value));
+            history.replaceState(null, "", (showHtml.checked ? "#html=" : "#code=") + encode(value));
             playground.href = "../playground/#theme=vs-code-light&font=14&mode=split&split=50&code=" +
                 encode(asPreviewFile(lastCode));
         }
 
         function setMode(html) {
             editorLabel.textContent = html ? "HTML" : "Compose";
-            editor.setAttribute("aria-label", html ? "HTML code" : "Compose code");
+            editor.setHtml(html);
         }
 
         showHtml.addEventListener("change", function () {
+            var value = editor.getValue();
             if (showHtml.checked) {
-                lastCode = editor.value;
-                editor.value = asHtml(editor.value);
+                lastCode = value;
+                editor.setValue(asHtml(value));
             } else {
-                editor.value = codeFromHtml(editor.value) || lastCode;
+                editor.setValue(codeFromHtml(value) || lastCode);
             }
             setMode(showHtml.checked);
             run();
         });
 
-        editor.addEventListener("keydown", function (event) {
-            if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-                event.preventDefault();
-                run();
-            } else if (event.key === "Tab" && !event.shiftKey) {
-                // Tab indents instead of leaving the editor.
-                event.preventDefault();
-                document.execCommand("insertText", false, "    ");
-            }
-        });
         document.getElementById("run").addEventListener("click", run);
 
         // ---------- resizing the panes ----------
@@ -267,6 +380,7 @@
             var value = Math.round(Math.min(MAX, Math.max(MIN, percent)));
             panes.style.setProperty("--split", value + "%");
             gutter.setAttribute("aria-valuenow", String(value));
+            editor.refresh();
             if (save) {
                 try { localStorage.setItem(SPLIT_KEY, String(value)); } catch (e) { /* storage blocked */ }
             }
@@ -322,6 +436,7 @@
 
         function setOrientation() {
             gutter.setAttribute("aria-orientation", stacked.matches ? "horizontal" : "vertical");
+            editor.refresh();
         }
         stacked.addEventListener("change", setOrientation);
         setOrientation();
@@ -332,10 +447,10 @@
         var html = hashValue("html");
         if (html !== null) {
             showHtml.checked = true;
-            editor.value = html;
+            editor.setValue(html);
         } else {
             showHtml.checked = false;
-            editor.value = hashValue("code") || DEFAULT_CODE;
+            editor.setValue(hashValue("code") || DEFAULT_CODE);
         }
         setMode(showHtml.checked);
         run();

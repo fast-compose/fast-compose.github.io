@@ -29,6 +29,11 @@ holds only the meta tags, a loader shown until compose-script starts, and a `<no
 
 [`try/index.html`](try/index.html) is an editor beside a result pane, running the code with compose-script.
 
+- The editor is [CodeMirror 5](https://codemirror.net/5/) from cdnjs, in the site's colors: Kotlin, plus an overlay
+  that colors capitalized names and function calls. With **Show HTML**, the HTML is colored and the code inside
+  `<script type="text/compose-content">` and `text/compose-preview` tags is colored as Kotlin. If CodeMirror doesn't
+  load, the plain textarea is used.
+
 - The code is the body of a composable. **Show HTML** (off by default) turns it into the whole web page that holds it,
   which can be edited and run as is; turning it off reads the code back from the page's first
   `<script type="text/compose-content">`.
