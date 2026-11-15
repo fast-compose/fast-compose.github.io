@@ -68,7 +68,7 @@
         <li><a href="https://plugins.jetbrains.com/plugin/35776-fast-compose-preview">IDE Plugin</a>: instant previews in Android Studio and IntelliJ IDEA.</li>
         <li><a href="https://marketplace.visualstudio.com/items?itemName=fast-compose.fast-compose-preview">VS Code Extension</a>: instant previews in VS Code.</li>
         <li><a href="https://github.com/fast-compose/fast-compose/blob/main/docs/LIBRARY.md">KMP Library</a>: render Compose code at runtime in your Kotlin Multiplatform apps.</li>
-        <li><a href="https://github.com/fast-compose/compose-cli">CLI and MCP</a>: check and render previews from the terminal and AI agents.</li>
+        <li><a href="https://github.com/fast-compose/compose-cli">Fast Compose CLI</a>: check and render previews from the terminal, in CI, and as an MCP server for AI agents. <a href="https://github.com/fast-compose/compose-cli/releases">Download</a>.</li>
     </ul>
 </noscript>
 
@@ -898,9 +898,9 @@
     @Composable
     fun CliSection(wide: Boolean, modifier: Modifier, open: (String) -> Unit) {
         val commands = listOf(
-            Command("fast-compose check <paths>", "Parse errors, unknown names and runtime errors"),
-            Command("fast-compose render <paths> -o out/", "A PNG per @Preview"),
-            Command("fast-compose list <paths>", "The previews in each file"),
+            Command("fast-compose check -r app/src", "Parse errors, unknown names and runtime errors"),
+            Command("fast-compose render Home.kt -o previews", "A PNG per @Preview"),
+            Command("fast-compose list -r app/src --json", "The previews and their settings"),
             Command("fast-compose mcp", "An MCP server for AI agents")
         )
         Section(modifier) {
@@ -908,15 +908,24 @@
                 wide,
                 left = {
                     Column {
-                        Eyebrow("CLI & MCP")
-                        Title("Compose for the terminal and AI agents.", "COMING SOON", Amber)
+                        Eyebrow("Fast Compose CLI & MCP")
+                        Title("Compose for the terminal and AI agents.", "LIVE")
                         Lead(
-                            "compose-cli checks and renders Compose previews from the terminal, in CI, or as an MCP " +
-                                "server that AI agents call while they write UI code. No Gradle, no compiler, no " +
-                                "Android Studio."
+                            "The Fast Compose CLI checks and renders Compose previews from the terminal, in CI, or as " +
+                                "an MCP server that AI agents call while they write UI code. No Gradle, no compiler, " +
+                                "no Android Studio."
                         )
+                        Check("One download", "for Windows, macOS and Linux, with its own Java runtime")
+                        Check("Your project:", "other files, R and Res resources, and library jars")
+                        Check("Text or JSON", "output and exit codes for CI")
+                        Check("MCP tools", "check, render and list_previews, with images for the agent")
+                        Spacer(Modifier.height(28.dp))
                         Buttons {
-                            GhostButton("Follow on GitHub") { open("https://github.com/fast-compose/compose-cli") }
+                            PrimaryButton("Download →") { open("https://github.com/fast-compose/compose-cli/releases") }
+                            GhostButton("Docs") { open("https://github.com/fast-compose/compose-cli#readme") }
+                            GhostButton("MCP setup") {
+                                open("https://github.com/fast-compose/compose-cli/blob/main/docs/MCP.md")
+                            }
                         }
                     }
                 },
