@@ -50,6 +50,42 @@
         .bar a.link { font-size: 14px; color: var(--muted); }
         .bar a.link:hover { color: var(--text); }
 
+        /* Code / Split / Preview */
+        .modes { display: inline-flex; border: 1px solid var(--outline); border-radius: 10px; overflow: hidden; }
+        .modes button {
+            background: transparent; color: var(--muted); border: 0; cursor: pointer;
+            font: 600 13px var(--sans); padding: 6px 12px;
+        }
+        .modes button + button { border-left: 1px solid var(--outline); }
+        .modes button:hover { color: var(--text); }
+        .modes button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+        /* Share */
+        .share-btn {
+            cursor: pointer; background: transparent; color: var(--text);
+            border: 1px solid var(--outline); border-radius: 10px; font: 600 14px var(--sans); padding: 6px 14px;
+        }
+        .share-btn:hover { border-color: var(--muted); }
+        #share-dialog {
+            width: min(380px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--outline); border-radius: 16px;
+            background: var(--surface); color: var(--text); font-family: var(--sans);
+        }
+        #share-dialog::backdrop { background: rgba(4, 8, 20, .7); }
+        #share-dialog h2 { margin: 0 0 16px; font-size: 18px; }
+        .qr {
+            display: grid; place-items: center; min-height: 240px; padding: 16px;
+            background: #FFFFFF; border-radius: 12px; margin-bottom: 16px;
+        }
+        .qr img, .qr canvas { width: 208px; height: 208px; image-rendering: pixelated; }
+        .qr p { margin: 0; color: #475569; font-size: 14px; text-align: center; }
+        .copy-row { display: flex; gap: 8px; }
+        .copy-row input {
+            flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--outline); border-radius: 10px;
+            background: var(--code-bg); color: var(--text); font: 13px var(--mono);
+        }
+        .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+        #share-dialog .toggle { margin-top: 14px; }
+
         /* --split is the code pane's share: of the width side by side, of the height when stacked */
         .panes {
             --split: 50%;
@@ -113,7 +149,36 @@
         .cm-s-fast .cm-tag { color: var(--tok-type); }
         .cm-s-fast .cm-attribute { color: var(--tok-ann); }
         .cm-s-fast .cm-def.cm-tag, .cm-s-fast .cm-meta.cm-tag { color: var(--tok-type); }
-        #result { flex: 1; width: 100%; border: 0; background: #FFFFFF; }
+        /* the white border is the space around the result; inside it, 100vw and 100vh are the visible area */
+        #result { flex: 1; width: 100%; box-sizing: border-box; border: 16px solid #FFFFFF; background: #FFFFFF; }
+
+        /* one pane only: the other pane and the gutter are hidden */
+        .panes.mode-edit, .panes.mode-preview { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+        .panes.mode-edit .gutter, .panes.mode-edit .result-pane,
+        .panes.mode-preview .gutter, .panes.mode-preview .code-pane { display: none; }
+
+        /* full screen: the result alone, with a button back to the split layout */
+        .panes.mode-full { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+        .panes.mode-full .gutter, .panes.mode-full .code-pane, .panes.mode-full .pane-label { display: none; }
+        .panes.mode-full #result { border-width: 0; }
+        body.full .bar { display: none; }
+        .exit-full {
+            display: none; position: fixed; top: 16px; right: 16px; z-index: 5;
+            align-items: center; gap: 5px; cursor: pointer;
+            background: rgba(255, 255, 255, .85); color: #334155; border: 1px solid #CBD5E1;
+            border-radius: 999px; font: 600 12px/1 var(--sans); letter-spacing: .01em; padding: 6px 11px 6px 9px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 4px 12px rgba(15, 23, 42, .08);
+            backdrop-filter: blur(8px); opacity: .9;
+            transition: opacity .15s, color .15s, border-color .15s, box-shadow .15s, transform .15s;
+        }
+        .exit-full svg { width: 14px; height: 14px; }
+        .exit-full:hover {
+            opacity: 1; color: #0F172A; border-color: #94A3B8; transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, .08), 0 8px 20px rgba(15, 23, 42, .12);
+        }
+        .exit-full:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        body.full .exit-full { display: inline-flex; }
+        .full-btn { font-size: 16px; line-height: 1; padding: 6px 10px; }
 
         @media (max-width: 760px) {
             .panes { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, var(--split)) 8px minmax(0, 1fr); }
@@ -135,12 +200,18 @@
     <span class="keys">or Ctrl + Enter</span>
     <label class="toggle"><input type="checkbox" id="show-html"> Show HTML</label>
     <span class="spacer"></span>
+    <div class="modes" role="group" aria-label="Layout">
+        <button type="button" data-mode="edit" aria-pressed="false">Code</button>
+        <button type="button" data-mode="split" aria-pressed="true">Split</button>
+        <button type="button" data-mode="preview" aria-pressed="false">Preview</button>
+    </div>
+    <button class="share-btn full-btn" id="full" type="button" title="Full screen preview" aria-label="Full screen preview">&#x26F6;</button>
     <a class="link" id="playground" target="_blank" rel="noopener">Open in Playground</a>
-    <a class="link" href="../learn/">Lessons</a>
+    <button class="share-btn" id="share" type="button">Share</button>
 </div>
 
 <div class="panes">
-    <div class="pane">
+    <div class="pane code-pane">
         <div class="pane-label" id="editor-label">Compose</div>
         <div class="editor-host">
             <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code"></textarea>
@@ -148,12 +219,35 @@
     </div>
     <div class="gutter" id="gutter" role="separator" tabindex="0" aria-label="Resize the code and result panes"
          aria-valuemin="15" aria-valuemax="85" aria-valuenow="50" title="Drag to resize, double click to reset"></div>
-    <div class="pane">
+    <div class="pane result-pane">
         <div class="pane-label">Result</div>
         <iframe id="result" title="Result"></iframe>
     </div>
+    <button class="exit-full" id="exit-full" type="button" title="Back to code and preview (Esc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+            <polyline points="8 6 2 12 8 18"></polyline>
+            <polyline points="16 6 22 12 16 18"></polyline>
+        </svg>
+        Show code
+    </button>
 </div>
 
+<dialog id="share-dialog" aria-labelledby="share-title">
+    <h2 id="share-title">Share</h2>
+    <div class="qr" id="qr"></div>
+    <div class="copy-row">
+        <input id="share-link" type="text" readonly aria-label="Link">
+        <button class="run-btn" id="copy-link" type="button">Copy</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="share-full"> Open in full screen</label>
+    <div class="dialog-actions">
+        <button class="share-btn" id="native-share" type="button" hidden>Share via…</button>
+        <button class="share-btn" id="close-share" type="button">Close</button>
+    </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
@@ -164,8 +258,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script>
-    // Runs Compose code with compose-script. The code is the body of a composable; with "Show HTML" it is the whole
-    // page that holds it. The page address keeps it as #code=… or #html=… (URL-safe Base64, without padding).
+    // Runs Compose code with compose-script. The code is the body of a composable, or a whole file whose entry
+    // composable is shown (data-composable); with "Show HTML" it is the whole page that holds it. The page address
+    // keeps it as #zcode=… (with &entry=Name for a whole file) or #zhtml=…: the UTF-8 text compressed with raw
+    // deflate, in URL-safe Base64 without padding. Browsers without CompressionStream write #code=… or #html=…, the
+    // same without compression, and older links in that form still open. &mode=edit|split|preview|full keeps the layout.
     // Each run writes a new document into the iframe, since compose-script reads its tags once, at start.
     (function () {
         var COMPOSE_SCRIPT = "https://cdn.jsdelivr.net/npm/@fast-compose/compose-script/compose-script.js";
@@ -187,28 +284,86 @@
         var result = document.getElementById("result");
         var playground = document.getElementById("playground");
 
-        // The last Compose code, kept for when the HTML has no Compose script to read it back from.
+        // The last Compose code and its entry composable, kept for when the HTML has no Compose script to read them
+        // back from.
         var lastCode = DEFAULT_CODE;
+        var lastEntry = null;
+        // The entry composable of the code in the Compose editor, from the HTML or the link, while it is declared.
+        var entry = null;
+        var MODES = ["edit", "split", "preview", "full"];
+        var mode = "split";
 
-        function encode(text) {
-            var bytes = new TextEncoder().encode(text), binary = "";
-            bytes.forEach(function (b) { binary += String.fromCharCode(b); });
+        // ---------- links ----------
+
+        var CAN_COMPRESS = typeof CompressionStream === "function" && typeof DecompressionStream === "function";
+
+        function toBase64Url(bytes) {
+            var binary = "";
+            for (var i = 0; i < bytes.length; i += 0x8000) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+            }
             return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
         }
 
-        function decode(value) {
+        // The bytes of URL-safe Base64 [value], or null when it isn't Base64.
+        function fromBase64Url(value) {
             try {
                 var base64 = value.replace(/-/g, "+").replace(/_/g, "/");
                 var binary = atob(base64 + "===".slice((base64.length + 3) % 4));
-                return new TextDecoder().decode(Uint8Array.from(binary, function (c) { return c.charCodeAt(0); }));
+                return Uint8Array.from(binary, function (c) { return c.charCodeAt(0); });
             } catch (e) {
                 return null;
             }
         }
 
-        function hashValue(key) {
+        // [bytes] passed through a CompressionStream or DecompressionStream.
+        function pipe(bytes, stream) {
+            return new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()
+                .then(function (buffer) { return new Uint8Array(buffer); });
+        }
+
+        // [text] in URL-safe Base64, without compression.
+        function encode(text) {
+            return toBase64Url(new TextEncoder().encode(text));
+        }
+
+        // The text of an uncompressed link value, or null.
+        function decode(value) {
+            var bytes = fromBase64Url(value);
+            try {
+                return bytes ? new TextDecoder("utf-8", { fatal: true }).decode(bytes) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // [text] compressed with raw deflate, in URL-safe Base64.
+        function compress(text) {
+            return pipe(new TextEncoder().encode(text), new CompressionStream("deflate-raw")).then(toBase64Url);
+        }
+
+        // The text of a compressed link value, or null when it can't be read.
+        function decompress(value) {
+            var bytes = fromBase64Url(value);
+            if (!bytes || !CAN_COMPRESS) return Promise.resolve(null);
+            return pipe(bytes, new DecompressionStream("deflate-raw"))
+                .then(function (data) { return new TextDecoder("utf-8", { fatal: true }).decode(data); })
+                .catch(function () { return null; });
+        }
+
+        // The raw value of [key] in the page address, or null.
+        function hashText(key) {
             var match = location.hash.match(new RegExp("[#&]" + key + "=([^&]*)"));
-            return match ? decode(match[1]) : null;
+            return match ? match[1] : null;
+        }
+
+        // The text kept under [key] in the page address: compressed as z[key], or plain as [key]; null when neither
+        // can be read.
+        function hashCode(key) {
+            var packed = hashText("z" + key);
+            if (packed !== null) return decompress(packed);
+            var plain = hashText(key);
+            return Promise.resolve(plain === null ? null : decode(plain));
         }
 
         function indent(text, spaces) {
@@ -227,8 +382,8 @@
             return lines.map(function (l) { return l.slice(shared); }).join("\n");
         }
 
-        // A whole page that renders the code with compose-script.
-        function asHtml(code) {
+        // A whole page that renders the code with compose-script; [name], when given, is the entry composable.
+        function asHtml(code, name) {
             var safe = code.replace(/<\/script/gi, "<\\/script");
             return [
                 "<!DOCTYPE html>",
@@ -238,7 +393,7 @@
                 "</head>",
                 "<body>",
                 "",
-                '<script type="text/compose-content">',
+                '<script type="text/compose-content"' + (name ? ' data-composable="' + name + '"' : "") + ">",
                 indent(safe, 4),
                 "<\/script>",
                 "",
@@ -247,15 +402,38 @@
             ].join("\n");
         }
 
-        // The Compose code of the first content script in [html], or null when there is none.
+        // The Compose code and entry composable (or null) of the first content script in [html], or null when there
+        // is none.
         function codeFromHtml(html) {
-            var match = html.match(/<script[^>]*type=["']text\/compose-content["'][^>]*>([\s\S]*?)<\/script>/i);
-            return match ? dedent(match[1]) : null;
+            var match = html.match(/<script([^>]*type=["']text\/compose-content["'][^>]*)>([\s\S]*?)<\/script>/i);
+            if (!match) return null;
+            var name = match[1].match(/data-composable=["']\s*([^"']*?)\s*["']/i);
+            return { code: dedent(match[2]), entry: name && name[1] ? name[1] : null };
         }
 
-        // The code as a whole file with a @Preview function, for the playground.
-        function asPreviewFile(body) {
-            return "@Preview(showBackground = true)\n@Composable\nfun Example() {\n" + indent(body, 4) + "\n}\n";
+        // The top-level @Composable functions without parameters in [code], in order.
+        function composables(code) {
+            var names = [], pattern = /^@Composable\s+(?:(?:private|internal|public)\s+)?fun\s+([A-Za-z_]\w*)\s*\(\s*\)/gm;
+            var match;
+            while ((match = pattern.exec(code))) names.push(match[1]);
+            return names;
+        }
+
+        // The entry composable of [code]: null for the body of a composable; for a whole file, [preferred] while it
+        // is declared, else the last top-level @Composable function without parameters.
+        function entryOf(code, preferred) {
+            var names = composables(code);
+            if (!names.length) return null;
+            return preferred && names.indexOf(preferred) >= 0 ? preferred : names[names.length - 1];
+        }
+
+        // The code as a whole file with a @Preview function, for the playground. A whole file is kept as it is, with
+        // a preview of its entry composable added when it has no @Preview of its own.
+        function asPreviewFile(code, name) {
+            if (!name) return "@Preview(showBackground = true)\n@Composable\nfun Example() {\n" + indent(code, 4) + "\n}\n";
+            if (/^\s*@Preview\b/m.test(code)) return code;
+            return code.replace(/\s*$/, "") + "\n\n@Preview(showBackground = true)\n@Composable\nfun " + name +
+                "Preview() {\n    " + name + "()\n}\n";
         }
 
         // ---------- the editor ----------
@@ -334,22 +512,58 @@
             };
         }
 
-        function currentCode() {
-            if (!showHtml.checked) return editor.getValue();
-            return codeFromHtml(editor.getValue()) || lastCode;
+        // The Compose code and its entry composable, from the editor or, with "Show HTML", from its content script.
+        function current() {
+            var value = editor.getValue();
+            if (!showHtml.checked) return { code: value, entry: entryOf(value, entry) };
+            return codeFromHtml(value) || { code: lastCode, entry: lastEntry };
+        }
+
+        // Counts link updates, so a slower compression never overwrites a newer address.
+        var linkVersion = 0;
+
+        // Keeps the code, its entry composable and the layout in the page address, and the playground link up to
+        // date. Resolves once the address is written.
+        function updateLinks() {
+            var value = editor.getValue();
+            var key = showHtml.checked ? "html" : "code";
+            var version = ++linkVersion;
+            var split = gutter ? gutter.getAttribute("aria-valuenow") : "50";
+            var file = asPreviewFile(lastCode, lastEntry);
+            var playgroundBase = "../playground/#theme=vs-code-light&font=14&mode=" +
+                (mode === "full" ? "preview" : mode) + "&split=" + split;
+            // The compressed value as key=…, or null when compression isn't available or fails.
+            function packed(name, text) {
+                if (!CAN_COMPRESS) return Promise.resolve(null);
+                return compress(text).then(function (data) { return "z" + name + "=" + data; }, function () { return null; });
+            }
+            return Promise.all([packed(key, value), packed("code", file)]).then(function (parts) {
+                if (version !== linkVersion) return;
+                var address = "#" + (parts[0] || key + "=" + encode(value));
+                if (!showHtml.checked && lastEntry) address += "&entry=" + lastEntry;
+                history.replaceState(null, "", address + "&mode=" + mode);
+                playground.href = playgroundBase + "&" + (parts[1] || "code=" + encode(file));
+            });
+        }
+
+        // Takes the editor's code and entry composable as the latest ones, and updates the links. Resolves once the
+        // page address is written.
+        function sync() {
+            var now = current();
+            if (!showHtml.checked) entry = now.entry;
+            lastCode = now.code;
+            lastEntry = now.entry;
+            return updateLinks();
         }
 
         function run() {
+            sync();
             var value = editor.getValue();
-            var html = showHtml.checked ? value : asHtml(value);
-            result.srcdoc = html.replace("</head>", "<style>body { margin: 16px; background: #FFFFFF; }</style></head>");
-            lastCode = currentCode();
-            history.replaceState(null, "", (showHtml.checked ? "#html=" : "#code=") + encode(value));
-            playground.href = "../playground/#theme=vs-code-light&font=14&mode=split&split=50&code=" +
-                encode(asPreviewFile(lastCode));
+            var html = showHtml.checked ? value : asHtml(value, lastEntry);
+            result.srcdoc = html.replace("</head>", "<style>html, body { margin: 0; background: #FFFFFF; }</style></head>");
         }
 
-        function setMode(html) {
+        function setHtmlMode(html) {
             editorLabel.textContent = html ? "HTML" : "Compose";
             editor.setHtml(html);
         }
@@ -357,16 +571,148 @@
         showHtml.addEventListener("change", function () {
             var value = editor.getValue();
             if (showHtml.checked) {
+                entry = entryOf(value, entry);
                 lastCode = value;
-                editor.setValue(asHtml(value));
+                lastEntry = entry;
+                editor.setValue(asHtml(value, entry));
             } else {
-                editor.setValue(codeFromHtml(value) || lastCode);
+                var found = codeFromHtml(value) || { code: lastCode, entry: lastEntry };
+                entry = found.entry;
+                editor.setValue(found.code);
             }
-            setMode(showHtml.checked);
+            setHtmlMode(showHtml.checked);
             run();
         });
 
         document.getElementById("run").addEventListener("click", run);
+
+        // ---------- Code / Split / Preview ----------
+
+        var modeButtons = document.querySelectorAll(".modes button");
+
+        function setLayout(value) {
+            mode = MODES.indexOf(value) >= 0 ? value : "split";
+            MODES.forEach(function (m) { panes.classList.toggle("mode-" + m, m === mode); });
+            document.body.classList.toggle("full", mode === "full");
+            modeButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mode === mode)); });
+            editor.refresh();
+        }
+
+        function switchLayout(value) {
+            setLayout(value);
+            updateLinks();
+        }
+
+        modeButtons.forEach(function (button) {
+            button.addEventListener("click", function () { switchLayout(button.dataset.mode); });
+        });
+        document.getElementById("full").addEventListener("click", function () { switchLayout("full"); });
+        document.getElementById("exit-full").addEventListener("click", function () { switchLayout("split"); });
+
+        // Keeps "Show code" 16px from the result's own scrollbar, which takes the right edge when the result scrolls.
+        var exitFull = document.getElementById("exit-full");
+        function placeExitButton() {
+            var scrollbar = 0;
+            try {
+                var doc = result.contentDocument;
+                if (doc && doc.documentElement) scrollbar = result.clientWidth - doc.documentElement.clientWidth;
+            } catch (e) { /* the result can't be read */ }
+            exitFull.style.right = (16 + Math.max(0, scrollbar)) + "px";
+        }
+        result.addEventListener("load", function () {
+            placeExitButton();
+            try {
+                new ResizeObserver(placeExitButton).observe(result.contentDocument.documentElement);
+            } catch (e) { /* no ResizeObserver, or the result can't be read */ }
+        });
+        window.addEventListener("resize", placeExitButton);
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && mode === "full" && !shareDialog.open) switchLayout("split");
+        });
+
+        // ---------- share ----------
+
+        var SITE = "https://fast-compose.github.io/try/";
+        // Longer links don't fit in a QR code that a phone can still read.
+        var QR_LIMIT = 2000;
+        var shareDialog = document.getElementById("share-dialog");
+        var shareLink = document.getElementById("share-link");
+        var shareFull = document.getElementById("share-full");
+        var copyLink = document.getElementById("copy-link");
+        var nativeShare = document.getElementById("native-share");
+        var qr = document.getElementById("qr");
+
+        // The QR code of [url], or a note when it is too long or the QR library didn't load.
+        function showQr(url) {
+            qr.textContent = "";
+            var note = null;
+            if (!window.QRCode) note = "The QR code couldn't load. Copy the link instead.";
+            else if (url.length > QR_LIMIT) note = "The code is too long for a QR code. Copy the link instead.";
+            else {
+                try {
+                    new QRCode(qr, { text: url, width: 416, height: 416, correctLevel: QRCode.CorrectLevel.L });
+                } catch (e) {
+                    qr.textContent = "";
+                    note = "The code is too long for a QR code. Copy the link instead.";
+                }
+            }
+            if (note) {
+                var p = document.createElement("p");
+                p.textContent = note;
+                qr.appendChild(p);
+            }
+        }
+
+        function copy(text) {
+            if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+            shareLink.select();
+            document.execCommand("copy");
+            return Promise.resolve();
+        }
+
+        // The link to share: the page address, with the full screen layout when "Open in full screen" is ticked.
+        function shareUrl() {
+            var layout = shareFull.checked ? "full" : (mode === "full" ? "split" : mode);
+            return SITE + location.hash.replace(/([#&])mode=[^&]*/, "$1mode=" + layout);
+        }
+
+        function showShareLink() {
+            var url = shareUrl();
+            shareLink.value = url;
+            copyLink.textContent = "Copy";
+            showQr(url);
+        }
+
+        document.getElementById("share").addEventListener("click", function () {
+            sync().then(function () {
+                shareFull.checked = mode === "full";
+                nativeShare.hidden = !navigator.share;
+                showShareLink();
+                if (!shareDialog.open) shareDialog.showModal();
+                shareLink.select();
+            });
+        });
+        shareFull.addEventListener("change", showShareLink);
+        copyLink.addEventListener("click", function () {
+            copy(shareLink.value).then(function () {
+                copyLink.textContent = "Copied";
+            }, function () {
+                shareLink.select();
+                copyLink.textContent = "Press Ctrl + C";
+            });
+        });
+        nativeShare.addEventListener("click", function () {
+            navigator.share({ title: document.title, url: shareLink.value }).catch(function () { /* cancelled */ });
+        });
+        document.getElementById("close-share").addEventListener("click", function () { shareDialog.close(); });
+        // A click on the backdrop closes the dialog.
+        shareDialog.addEventListener("click", function (event) {
+            if (event.target !== shareDialog) return;
+            var box = shareDialog.getBoundingClientRect();
+            var inside = event.clientX >= box.left && event.clientX <= box.right &&
+                event.clientY >= box.top && event.clientY <= box.bottom;
+            if (!inside) shareDialog.close();
+        });
 
         // ---------- resizing the panes ----------
 
@@ -444,16 +790,20 @@
 
         // ---------- start ----------
 
-        var html = hashValue("html");
-        if (html !== null) {
-            showHtml.checked = true;
-            editor.setValue(html);
-        } else {
-            showHtml.checked = false;
-            editor.setValue(hashValue("code") || DEFAULT_CODE);
-        }
-        setMode(showHtml.checked);
-        run();
+        setLayout(hashText("mode"));
+        Promise.all([hashCode("html"), hashCode("code")]).then(function (values) {
+            var html = values[0], code = values[1];
+            if (html !== null) {
+                showHtml.checked = true;
+                editor.setValue(html);
+            } else {
+                showHtml.checked = false;
+                entry = hashText("entry");
+                editor.setValue(code || DEFAULT_CODE);
+            }
+            setHtmlMode(showHtml.checked);
+            run();
+        });
     })();
 </script>
 </body>
