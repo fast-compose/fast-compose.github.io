@@ -33,8 +33,15 @@ string|mode_edit|Q29kZQ==
 string|mode_preview|UHJldmlldw==
 string|mode_split_short|U3BsaXQ=
 string|mode_split|Q29kZSBhbmQgcHJldmlldw==
-string|msg_link_copied|TGluayBjb3BpZWQ=
 string|preview_restart|UnVuIGFnYWlu
+string|share_copied|Q29waWVk
+string|share_copy|Q29weSBsaW5r
+string|share_link_hint|QW55b25lIHdpdGggdGhpcyBsaW5rIGNhbiBvcGVuIHlvdXIgY29kZSwgdGhlbWUgYW5kIGxheW91dC4=
+string|share_qr_hint|U2NhbiB0byBvcGVuIHRoaXMgcGxheWdyb3VuZCBvbiBhbm90aGVyIGRldmljZS4=
+string|share_qr_too_long|VGhpcyBjb2RlIGlzIHRvbyBsb25nIGZvciBhIFFSIGNvZGUgYSBwaG9uZSBjYW4gc2Nhbi4gU2hhcmUgdGhlIGxpbmsgaW5zdGVhZC4=
+string|share_tab_link|TGluaw==
+string|share_tab_qr|UVIgY29kZQ==
+string|share_title|U2hhcmU=
 string|theme_dark|RGFyaw==
 string|theme_light|TGlnaHQ=
 string|toolbar_details|QWJvdXQ=
